@@ -30,15 +30,14 @@ kam_fcst_dcast[,gap := ML_FCST - USER_FCST]
 kam_fcst_dcast[,abs_gap := abs(gap)]
 
 #ML FCST는 있는데 USER FCST는 없는 제품
-
-no_user_fcst_list <- kam_fcst_dcast[is.na(USER_FCST), sum(ML_FCST), by=.(model_suffix_code)]
+no_user_fcst_list <- unique(kam_fcst_dcast[is.na(USER_FCST), model_suffix_code])
 #분석 대상에서 제외
-kam_fcst_melt[!model_suffix_code %in% no_user_fcst_list][is.na(value)]
+kam_fcst_melt <- kam_fcst_melt[!model_suffix_code %in% no_user_fcst_list]
+kam_fcst_dcast <- kam_fcst_dcast[!model_suffix_code %in% no_user_fcst_list]
 
-kam_fcst_melt[model_suffix_code == '32LK6100PLB.AEK']
-
-
-# Compare ML FCST and KAM FCST -------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------------------------------
+# Compare ML FCST and KAM FCST
+#------------------------------------------------------------------------------------------------------------------------------
 kam_fcst_melt <- kam_fcst_melt[Measure != 'GDMI_FCST']
 
 #account 단위 주차별 Gap

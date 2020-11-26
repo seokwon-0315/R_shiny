@@ -3,7 +3,7 @@ library('shiny')
 source('compare_user_vs_ml_fcst.R')
 
 
-ggplot() + geom_line(dataui <- fluidPage(
+ui <- fluidPage(
   
   # Application title
   titlePanel("Descriptive Statistics of Automobiles"),
@@ -52,17 +52,18 @@ ggplot() + geom_line(dataui <- fluidPage(
       conditionalPanel(
         condition = "input.Unit == 'total'",
         h4("Summary Statistics of a variable"),
-        plotlyOutput('T_fcst_plot'),
+        plotlyOutput('fcst_plot'),
         DT::dataTableOutput('T_gap_table')),
       
       conditionalPanel(
         condition = "input.Unit == 'model'",
         h4("Summary Statistics of a variable"),
-        plotlyOutput('M_fcst_plot'),
+        plotlyOutput('fcst_plot'),
         DT::dataTableOutput('M_gap_table'))
     )
   )
 )
+
 
 # Define server logic required to calculate summary statistics
 server <- function(input, output, session) {
@@ -98,6 +99,7 @@ server <- function(input, output, session) {
   })
   
   
+  
   output$M_fcst_plot <- renderPlotly({
     gg <- ggplot() + geom_line(data = kam_fcst_melt[account_name == input$M_account & product == input$M_product & model_suffix_code == input$M_model], aes(x=target_week_date, y=value, group = Measure, col = Measure)) +
       geom_line(data = kam_fcst_dcast[account_name == input$M_account & product == input$M_product & model_suffix_code == input$M_model], aes(x=target_week_date, y=abs_gap, colour = 'Gap')) +
@@ -114,6 +116,8 @@ server <- function(input, output, session) {
                                      by=.(account_name, product, target_week_date, weeknum)]
     gap_by_account
   })
+  
+  
 }
 
 
